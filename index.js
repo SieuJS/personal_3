@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
   const context = {
     X: "HELLO",
     Y: 1,
+    Z: 1,
     arr: [
        {c:1,list : {board :[1,2,3,4,5]}} ,
        {list : {board :[1,2,3,4,7,9]}}

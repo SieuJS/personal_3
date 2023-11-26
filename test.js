@@ -52,12 +52,22 @@ const parseTemplate = (content, context) => {
     case "+":
       break;
     default:
-      if (context[stateCmd]) {
-        result += context[stateCmd];
+      let components = stateCmd.split(' ')
+      console.log(components)
+      if(components.length === 1)
+      {
+      if (context[components[0]]) {
+        result += context[components[0]];
         result += parseTemplate(contentCmd,context)
       } else {
         throw new Error(`Not define ${stateCmd}`);
       }
+     }
+     else {
+      components = typeCmd +" "+ stateCmd.trim()
+      console.log(components)
+      result += calculateHandler(components.split(" "),context)
+     }
       break;
   }
   // console.log(result);
@@ -105,6 +115,8 @@ const evaluateIfCondition = (components, context) => {
     }
   }
 };
+
+
 
 function ifHandler(stateCmd, content, context) {
   let result = "";
@@ -248,8 +260,22 @@ function forHandler (stateCmd, content, context ){
   return result;
 }
 
-function getHandler(stateCmd, contentCmd, context) {
-  console.log(stateCmd)
+function calculateHandler(component, context){
+  
+  let result = context[component[0]];
+  for(let i = 1; i < component.length; i+=2){
+    switch(component[i]){
+      case "+":
+        result += context[component[i+1]];
+        break;
+      case "-" :
+        result -= context[component[i+1]];
+        break;
+      default:
+        break;
+    }
+  }
+  return result;
 }
 
 
