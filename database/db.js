@@ -73,20 +73,73 @@ const errHandler = async (err) => {
     }
 }
 
+let schema = {
+    Movies : "Movies",
+    Names : "Names" ,
+    Reviews : "Reviews",
+    Actors_with_Movies : "Actors_with_Movies",
+    Directors_with_Movies : "Directors_with_Movies"
+}
+
 const createShema = async () => {
     let dbcn = null;
-    let tables = ['Movie','Names', 'Reviews'];
+    
 
     try {
         dbcn = await db.connect();
-        await dbcn.any('Create table $1:name(id varchar(11) primary key, title char(100), "year" int,"runtimemins" int,image char(200));',['Movies'])
+        await dbcn.any(`Create table ${schema.Movies}(
+            id char(11) primary key, 
+            title char(200), 
+            "year" int,
+            "runtimeStr" char(12),
+            image char(200),
+            award char(200)
+            );`);
+        
+        await dbcn.oneOrNone(`
+            Create table ${schema.Names}(
+                id char(11) primary key,
+                name char(100),
+                image char(200),
+                sumary char(700),
+                birthdate date,
+                awart char(100)
+            )
+        `)
+
+        await dbcn.oneOrNone(`
+                Create table ${schema.Reviews}(
+                    movieId char(11) primary key,
+                    username char(40) ,
+                    warningSpoiler boolean ,
+                    date date,
+                    rate int,
+                    title char(200),
+                    content char (700)
+                );
+        `)
+
+        await dbcn.oneOrNone(`
+            Create table ${schema.Actors_with_Movies}(
+                movieId char(11) ,
+                actorId char(11),
+                Primary key (movieID, actorId)
+            );
+        `)
+
+        await dbcn.oneOrNone(`
+            Create table ${schema.Directors_with_Movies}(
+                movieId char(11) ,
+                directorId char(11),
+                Primary key (movieID, directorId)
+            );
+        `)
         console.log("create table Movies success")
     }catch (err){
         throw new Error("table" +err.message);
     }finally{
         if (dbcn) {
             dbcn.done();
-            console.log('Connection closed');
         }
         pgp.end(); // Close the global connection pool
     }
@@ -99,6 +152,8 @@ module.exports = {
         try {
             dbcn = await db.connect();
             const data = await dbcn.query("SELECT * FROM $1:alias ", [`${tbName}`]);
+
+
             return data;
         }
         catch (error) {
@@ -121,6 +176,7 @@ module.exports = {
         try {
             dbcn = await db.connect();
             const data = await dbcn.one("SELECT * FROM $1:alias WHERE id = $2", [`${tbName}`, `${id}`]);
+
             return data;
         }
         catch (error) {
