@@ -12,7 +12,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 
 app.get('/', (req, res) => {
-  const context = { x: true , Y : true}; // Change the value of x here
+  const context = {
+    X: "HELLO",
+    Y: 1,
+    arr: [
+       {c:1,list : {board :[1,2,3,4,5]}} ,
+       {list : {board :[1,2,3,4,7,9]}}
+    ],
+  };
 
   res.render('condition', context);
 });

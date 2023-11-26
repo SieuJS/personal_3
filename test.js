@@ -1,6 +1,6 @@
 const mark = "21321";
 const template = `<h1>${mark}{X}</h1>
-${mark}{if Y }
+${mark}{if Y === 1}
   <h1>Y</h1>
   ${mark}{for a in arr}
     ${mark}{for b in a.list.board}
@@ -67,6 +67,7 @@ const parseTemplate = (content, context) => {
 
 const evaluateIfCondition = (components, context) => {
   // search in context ;
+  let toCompare ;
   if (components.length === 1) {
     // check is defined or not
     if(context[components[0]])
@@ -76,21 +77,30 @@ const evaluateIfCondition = (components, context) => {
   } else {
     //if component > 1 => it must have an operator
     let operator = components[1];
+    if (components[2].includes('\'')) toCompare = components[2];
+    else {
+      
+      components[2] = parseInt(components[2])
+      if(!context[components[2]])
+        toCompare=components[2];
+      else
+      toCompare = context[components[2]]
+    }
     switch (operator) {
       case "===":
-        return context[components[0]] === context[components[2]];
+        return context[components[0]] === toCompare;
         break;
       case ">":
-        return context[components[0]] > context[components[2]];
+        return context[components[0]] > toCompare;
         break;
       case "<":
-        return context[components[0]] < context[components[2]];
+        return context[components[0]] < toCompare;
         break;
       case ">=":
-        return context[components[0]] >= context[components[2]];
+        return context[components[0]] >= toCompare;
         break;
       case "<=":
-        return context[components[0]] >= context[components[2]];
+        return context[components[0]] >= toCompare;
         break;
     }
   }
@@ -245,5 +255,4 @@ function getHandler(stateCmd, contentCmd, context) {
 
 function getOpenTag(content) {}
 
-const afterP = parseTemplate(template, context);
-console.log(afterP)
+module.exports = parseTemplate;
