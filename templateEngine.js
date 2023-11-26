@@ -34,7 +34,6 @@ function parseTemplate(content, context) {
 
     let command = content.slice(startCommandBlock, closeCommandTag);
     detemineCommand(command, content, context);
-
     // Find out  the next command
     return;
   }
