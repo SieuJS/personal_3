@@ -7,7 +7,7 @@ const movieRoute = require('./routes/movie')
 const templateEngine = require('./templateEngine');
 
 
-require('dotenv').config();
+
 const app = express();
 const PORT = 3000;
 
@@ -15,6 +15,11 @@ const PORT = 3000;
 app.engine('html', templateEngine);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
+
+app.use(express.static('./public'));
+app.use(bodyParser.json());
+
+app.use(movieRoute);
 
 app.get('/', (req, res) => {
   const context = {

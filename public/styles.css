@@ -1,0 +1,27 @@
+/* styles.css */
+/* Additional styles can be added here */
+/* Color Variables for Light Mode */
+:root {
+    /* Primary Colors */
+    --primary-color: #3498db; /* Main primary color */
+    --secondary-color: #2ecc71; /* Secondary color */
+  
+    /* Text Colors */
+    --text-color: #333; /* Main text color */
+    --heading-color: #000; /* Heading color */
+  
+    /* Background Colors */
+    --body-bg-color: #fff; /* Body background color */
+    --header-bg-color: #333; /* Header background color */
+    --nav-bg-color: #444; /* Navigation background color */
+    --section-bg-color: #f5f5f5; /* Section background color */
+  
+    /* Card Colors */
+    --card-bg-color: #fff; /* Card background color */
+    --card-text-color: #333; /* Card text color */
+    --card-hover-bg-color: #f0f0f0; /* Card hover background color */
+  }
+  
+/* Dark Mode Styles */
+
+  

@@ -16,7 +16,7 @@ const cn = {
     max : 30
 }
 
-const databaseName = "MoviesWebsite";
+const databaseName = "db21321";
 
 let db = pgp(cn);
 let createDbSuccess = false;
@@ -29,22 +29,18 @@ const createDB = async () => {
         dbcn = await db.connect();        
         // Attempt to create the database
         await dbcn.any("CREATE DATABASE $1:name;", [databaseName]);
-        console.log('Database created successfully');
         cn.database = databaseName;
-        console.log("Change db to " ,databaseName);
+        
         db = pgp(cn);
         createDbSuccess = true;
         await createShema();
     } catch (error) {
-        console.error('Error creating database:', error.message);
         let err = error.message
-        console.log("handling error:")
         await errHandler(err);
         // Throw an error or handle this case appropriately
     } finally {
         if (dbcn) {
             dbcn.done();
-            console.log('Connection closed');
         }
     }
 };
@@ -58,7 +54,7 @@ const errHandler = async (err) => {
         try {
             dbcn = await db.connect();
             await dbcn.any("DROP DATABASE $1:name;", [databaseName]);
-            console.log('DROP Database successfully');
+            
             await createDB();            
         }catch (error) {
             console.error('Error creating database:', error.message);
@@ -67,7 +63,6 @@ const errHandler = async (err) => {
         } finally {
             if (dbcn) {
                 dbcn.done();
-                console.log('Connection closed');
             }
         }
     }
@@ -88,28 +83,29 @@ const createShema = async () => {
     try {
         dbcn = await db.connect();
         await dbcn.any(`Create table ${schema.Movies}(
-            id char(11) primary key, 
+            id varchar(11) primary key, 
             title char(200), 
             "year" int,
             "runtimeStr" char(12),
             image char(200),
-            award char(200)
+            awards char(200),
+            rating float
             );`);
         
         await dbcn.oneOrNone(`
             Create table ${schema.Names}(
-                id char(11) primary key,
+                id varchar(11) primary key,
                 name char(100),
                 image char(200),
                 sumary char(700),
                 birthdate date,
-                awart char(100)
+                awards char(100)
             )
         `)
 
         await dbcn.oneOrNone(`
                 Create table ${schema.Reviews}(
-                    movieId char(11) primary key,
+                    movieId varchar(11) primary key,
                     username char(40) ,
                     warningSpoiler boolean ,
                     date date,
@@ -121,32 +117,32 @@ const createShema = async () => {
 
         await dbcn.oneOrNone(`
             Create table ${schema.Actors_with_Movies}(
-                movieId char(11) ,
-                actorId char(11),
+                movieId varchar(11) ,
+                actorId varchar(11),
                 Primary key (movieID, actorId)
             );
         `)
 
         await dbcn.oneOrNone(`
             Create table ${schema.Directors_with_Movies}(
-                movieId char(11) ,
-                directorId char(11),
+                movieId varchar(11) ,
+                directorId varchar(11),
                 Primary key (movieID, directorId)
             );
         `)
-        console.log("create table Movies success")
+        
     }catch (err){
         throw new Error("table" +err.message);
     }finally{
         if (dbcn) {
             dbcn.done();
         }
-        pgp.end(); // Close the global connection pool
     }
 }
 
 
 module.exports = {
+    inserted  : false,
     getAll : async (tbName) => {
         let dbcn = null;
         try {
@@ -165,6 +161,7 @@ module.exports = {
     }, 
     insert : async (tbName, entity) => {
         const query = await pgp.helpers.insert(entity, null, tbName);
+        this.inserted = true;
         const data = await db.one(query + 'RETURNING id');
         return data;
     },

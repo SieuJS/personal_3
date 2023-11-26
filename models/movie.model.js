@@ -1,25 +1,33 @@
 const db = require('../database/db')
-const {Movies} = require ('../database/data');
+const getMoviesData= require ('../database/data');
 const tbName = "movies"
 
-const uniqueMovies = Movies.reduce((unique, movie) => {
-    const existingMovie = unique.find((m) => m.id === movie.id);
-    if (!existingMovie) {
-        unique.push(movie);
-    }
-    return unique;
-}, []);
+
 
 module.exports = class Movie {
-    constructor ({id , title, year , runtimeMins, image}){
+    constructor ({id , title, year , runtimeStr, image, awards, rating}){
         this.id  = id; 
         this.title = title ;
         this.year = year;
-        this.runtimemins = runtimeMins;
+        this.runtimeStr = runtimeStr;
         this.image = image ;
+        this.awards = awards;
+        this.rating = rating;
     }
     static async run () {
-        console.log(Movies)
+        if(!db.inserted)
+        {
+        let {Movies} = await getMoviesData()
+        
+        const uniqueMovies = Movies.reduce((unique, movie) => {
+            const existingMovie = unique.find((m) => m.id.trim() === movie.id.trim());
+            if (!existingMovie) {
+                unique.push(movie);
+            }
+            return unique;
+        }, []);
+        await this.insertAll(uniqueMovies)
+        }
     }
 
     static async insert (movie) {
@@ -27,7 +35,7 @@ module.exports = class Movie {
         return rs ; 
     }
 
-    static async insertAll () {
+    static async insertAll (uniqueMovies) {
         for(let mov of uniqueMovies) {
             
             let transMovie = new Movie({
@@ -35,7 +43,9 @@ module.exports = class Movie {
                 title : mov.title,
                 year : parseInt(mov.year),
                 image : mov.image,
-                runtimeMins: parseInt(mov.runtimeMins)
+                runtimeStr: mov.runtimeStr,
+                awards : mov.awards ,
+                rating : parseFloat(mov.imDbRating)
             });
             try{
                 await this.insert(transMovie)
@@ -50,6 +60,10 @@ module.exports = class Movie {
     static async getAll () {
         const data = await db.getAll(tbName);
         return data;
+    }
+
+    static async getTop5ratings() {
+        
     }
 
 }
