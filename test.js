@@ -3,7 +3,7 @@ const template = `<h1>${mark}{X}</h1>
 ${mark}{if Y }
   <h1>Y</h1>
   ${mark}{for a in arr}
-    ${mark}{for b in a}
+    ${mark}{for b in a.list.board}
       <h1>${mark}{b}</h1>
     {/for} 
   {/for}
@@ -13,8 +13,11 @@ ${mark}{if Y }
 
 const context = {
   X: "HELLO",
-  Y: true,
-  arr: [['1', '2'],['3', '4'],['5', '6']],
+  Y: false,
+  arr: [
+     {c:1,list : {board :[1,2,3,4,5]}} ,
+     {list : {board :[1,2,3,4,7,9]}}
+  ],
 };
 
 const parseTemplate = (content, context) => {
@@ -204,11 +207,29 @@ function forHandler (stateCmd, content, context ){
   
   let [itor, word, itObj ] = stateComponents;
   
-  if(!context[itObj]) 
+  
+  itObj = itObj.split('.');
+  
+  let myObj
+
+  if(itObj.length === 1)
   {
-    throw new Error(`itor ${itObj} not defined`)
+  myObj = context[itObj[0]];
   }
-  let myObj = context[itObj];
+  else{
+  myObj = context[itObj[0]];
+  
+  while(itObj.length > 1)
+  {  
+    myObj = myObj[itObj[1]]
+    itObj.shift()
+  }
+    
+  }
+  if(!myObj) 
+  {
+    throw new Error(`itor ${myObj} not defined`)
+  }
   for( let i in myObj) {
       let myContext = context;
       myContext[itor] = myObj[i];
