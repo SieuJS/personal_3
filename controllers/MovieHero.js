@@ -5,6 +5,7 @@ const MovieHomeTemplate =  require('../views/pages/home/home.template')
 
 
 module.exports = {
+    
     async Home (req, res, next) {
         res.send(MovieHomeTemplate())
     },
@@ -19,7 +20,7 @@ module.exports = {
             Movies = await response.json();
         }
         catch (err){
-            throw err;
+            return next(new HttpError(err.message, 500));
         }
         res.json(Movies)
     },

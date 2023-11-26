@@ -15,6 +15,7 @@ const cn = {
     password : process.env.DB_PW,
     max : 30
 }
+let inserted = false;
 
 const databaseName = "db21321";
 
@@ -32,7 +33,7 @@ const createDB = async () => {
         cn.database = databaseName;
         
         db = pgp(cn);
-        createDbSuccess = true;
+        console.log("create db succes")
         await createShema();
     } catch (error) {
         let err = error.message
@@ -45,7 +46,7 @@ const createDB = async () => {
     }
 };
 
-createDB();
+
 
 
 const errHandler = async (err) => {
@@ -73,13 +74,13 @@ let schema = {
     Names : "Names" ,
     Reviews : "Reviews",
     Actors_with_Movies : "Actors_with_Movies",
-    Directors_with_Movies : "Directors_with_Movies"
+    Directors_with_Movies : "Directors_with_Movies",
+    Favorites : "Favorites"
 }
 
 const createShema = async () => {
     let dbcn = null;
     
-
     try {
         dbcn = await db.connect();
         await dbcn.any(`Create table ${schema.Movies}(
@@ -130,6 +131,13 @@ const createShema = async () => {
                 Primary key (movieID, directorId)
             );
         `)
+
+        await dbcn.oneOrNone(`
+            Create table ${schema.Favorites}(
+                movieId varchar(11),
+                Primary key movieId;
+            )
+        `)
         
     }catch (err){
         throw new Error("table" +err.message);
@@ -141,8 +149,47 @@ const createShema = async () => {
 }
 
 
+
 module.exports = {
-    inserted  : false,
+    initial : async() =>{
+        
+        cn.database = databaseName;
+        db = pgp(cn);
+        let dbcn = null ;
+        try {
+            
+            dbcn = await db.connect();
+        }
+        catch (err) {
+            console.log("some err, create")
+            await createDB();
+        }finally {
+            dbcn.done();
+        }
+    },
+    client : pgp({
+        ...cn,
+        database : databaseName
+    }),
+    isInsert : async (tbName) => {
+        cn.database = databaseName;
+        db = pgp(cn);
+        let dbcn = null;
+        try {
+            dbcn = await db.connect();
+            const data = await dbcn.any("SELECT * FROM $1:alias LIMIT 5", [`${tbName}`]);
+            if(data.length === 0) {
+                return false;
+            }
+            else return true;
+        }
+        catch (error) {
+            throw new HttpError(error.message, 500);
+        }
+        finally {
+            dbcn.done();
+        }
+    },
     getAll : async (tbName) => {
         let dbcn = null;
         try {
@@ -161,12 +208,26 @@ module.exports = {
     }, 
     insert : async (tbName, entity) => {
         const query = await pgp.helpers.insert(entity, null, tbName);
-        this.inserted = true;
+        inserted = true;
         const data = await db.one(query + 'RETURNING id');
         return data;
     },
-    search : async (tbname, searchString) => {
-        
+    getTop5 : async () =>{
+        cn.database = databaseName;
+        db = pgp(cn);
+        let dbcn = null;
+        try {
+            dbcn = await db.connect();
+            const data = await dbcn.any(`SELECT * FROM $1:alias ORDER BY rating DESC LIMIT 5;
+            `, [`${tbName}`]);
+            return data;
+        }
+        catch (error) {
+            throw new Error(error.message);
+        }
+        finally {
+            dbcn.done();
+        }
     },
     findById : async (tbName, id) => {
         let dbcn = null;
@@ -188,7 +249,7 @@ module.exports = {
         try {
             dbcn = await db.connect();
             const data = await dbcn.any("SELECT * FROM $1:alias WHERE first_name like $2 or last_name like $2", [`${tbName}`, `%${namePattern}%`]);
-            console.log(data)
+   
             return data;
         }
         catch (error) {

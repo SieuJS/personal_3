@@ -15,8 +15,12 @@ module.exports = class Movie {
         this.rating = rating;
     }
     static async run () {
-        if(!db.inserted)
+        await db.initial();
+        
+        let isInsert = await db.isInsert(tbName);
+        if(!isInsert)
         {
+            console.log('Importing...')
         let {Movies} = await getMoviesData()
         
         const uniqueMovies = Movies.reduce((unique, movie) => {
@@ -45,7 +49,7 @@ module.exports = class Movie {
                 image : mov.image,
                 runtimeStr: mov.runtimeStr,
                 awards : mov.awards ,
-                rating : parseFloat(mov.imDbRating)
+                rating : isNaN(parseFloat(mov.imDbRating)) ?  0 : parseFloat(mov.imDbRating)
             });
             try{
                 await this.insert(transMovie)
@@ -63,7 +67,20 @@ module.exports = class Movie {
     }
 
     static async getTop5ratings() {
-        
+        let client = db.client;
+        let dbcn = null;
+        try {
+            dbcn = await client.connect();
+            const data = await dbcn.any(`SELECT * FROM $1:alias ORDER BY rating DESC LIMIT 5;
+            `, [`${tbName}`]);
+            return data;
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            dbcn.done();
+        }
     }
 
 }

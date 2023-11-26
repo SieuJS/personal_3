@@ -5,7 +5,9 @@ const bodyParser = require('body-parser')
 const HttpError = require('./models/http-error')
 const movieRoute = require('./routes/movie')
 const templateEngine = require('./templateEngine');
+const Movie = require('./models/movie.model');
 
+Movie.run();
 
 
 const app = express();
