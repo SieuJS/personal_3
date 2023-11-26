@@ -1,6 +1,6 @@
 // templateEngine.js
 const fs = require("fs");
-const parseTemplate = require('./test')
+const parseTemplate = require('./pareTemplate')
 
 const mark = "21321";
 

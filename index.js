@@ -1,8 +1,13 @@
 // app.js (or index.js)
 const path = require('path');
 const express = require('express');
+const bodyParser = require('body-parser')
+const HttpError = require('./models/http-error')
+const movieRoute = require('./routes/movie')
 const templateEngine = require('./templateEngine');
 
+
+require('dotenv').config();
 const app = express();
 const PORT = 3000;
 
