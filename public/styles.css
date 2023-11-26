@@ -1,27 +1,92 @@
 /* styles.css */
 /* Additional styles can be added here */
 /* Color Variables for Light Mode */
+
+/* Light Mode Colors */
 :root {
-    /* Primary Colors */
-    --primary-color: #3498db; /* Main primary color */
-    --secondary-color: #2ecc71; /* Secondary color */
-  
-    /* Text Colors */
-    --text-color: #333; /* Main text color */
-    --heading-color: #000; /* Heading color */
-  
-    /* Background Colors */
-    --body-bg-color: #fff; /* Body background color */
-    --header-bg-color: #333; /* Header background color */
-    --nav-bg-color: #444; /* Navigation background color */
-    --section-bg-color: #f5f5f5; /* Section background color */
-  
-    /* Card Colors */
-    --card-bg-color: #fff; /* Card background color */
-    --card-text-color: #333; /* Card text color */
-    --card-hover-bg-color: #f0f0f0; /* Card hover background color */
+    --primary-bg: #cc8b8b; /* Background color */
+    --primary-text: #333333; /* Text color */
+    --primary-accent: #ffa500; /* Accent color */
+    
+    /* Additional colors */
+    --secondary-bg: #c49b9b; /* Secondary background color */
+    --secondary-text: #555555; /* Secondary text color */
+    --accent-bg: #e0e0e0; /* Accent background color */
+    --accent-text: #000000; /* Accent text color */
+    
+    /* Borders and Dividers */
+    --border-color: #999999; /* Border color */
+    --divider-color: #cccccc; /* Divider color */
+    
+    /* Link Colors */
+    --link-color: #1e90ff; /* Link color */
+    --visited-link-color: #ff6b6b; /* Visited link color */
+    
+    /* Success, Error, Warning */
+    --success-color: #32cd32; /* Success color */
+    --error-color: #ff6347; /* Error color */
+    --warning-color: #ffd700; /* Warning color */
   }
   
-/* Dark Mode Styles */
-
   
+  .dark-mode {
+    --primary-bg: #121212; /* Background color */
+    --primary-text: #ffffff; /* Text color */
+    --primary-accent: #ffa500; /* Accent color */
+    
+    /* Additional colors */
+    --secondary-bg: #1e1e1e; /* Secondary background color */
+    --secondary-text: #d3d3d3; /* Secondary text color */
+    --accent-bg: #222; /* Accent background color */
+    --accent-text: #ffcc00; /* Accent text color */
+    
+    /* Borders and Dividers */
+    --border-color: #333; /* Border color */
+    --divider-color: #444; /* Divider color */
+    
+    /* Link Colors */
+    --link-color: #4ecdc4; /* Link color */
+    --visited-link-color: #ff6b6b; /* Visited link color */
+    
+    /* Success, Error, Warning */
+    --success-color: #00ff00; /* Success color */
+    --error-color: #ff0000; /* Error color */
+    --warning-color: #ffcc00; /* Warning color */
+  }
+  
+  
+  /* Global Styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Body Styles */
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Dark Mode Styles */
+  
+  
+  header  {
+    display : flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+  }
+  
+  header h1 {
+    color: var(--primary-text);
+  }
+  
+  nav {
+    background-color: var(--secondary-bg);
+  }
