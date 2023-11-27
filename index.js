@@ -6,11 +6,11 @@ const HttpError = require('./models/http-error')
 const movieRoute = require('./routes/movie')
 const templateEngine = require('./templateEngine');
 const Movie = require('./models/movie.model');
-
+require ('dotenv').config();
 
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 // Register custom template engine
 app.engine('html', templateEngine);

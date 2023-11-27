@@ -2,16 +2,16 @@ const Movie = require("../models/movie.model")
 const HttpError = require('../models/http-error')
 const getMoviesData = require('../database/data')
 const MovieHomeTemplate =  require('../views/pages/home/home.template')
-
-
+require ('dotenv').config();
+const PORT = process.env.PORT;
 module.exports = {
     
     async Home (req, res, next) {
         let top15Box , top5Rating, top15Fav;
         
         try{
-            top15Box= await fetch("http://localhost:3000/api/top15-box");
-            top5Rating = await fetch("http://localhost:3000/api/top5")
+            top15Box= await fetch(`http://localhost:${PORT}/api/top15-box`);
+            top5Rating = await fetch(`http://localhost:${PORT}/api/top5`)
             top15Fav = []
             if (!top15Box.ok || !top5Rating.ok) {
                 throw new Error('Failed to fetch data');
@@ -28,7 +28,7 @@ module.exports = {
     async MovieHerro (req, res, next) {
         let response , Movies
         try{
-            response= await fetch("http://localhost:3000/api/movies");
+            response= await fetch(`http://localhost:${PORT}/api/movies`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
