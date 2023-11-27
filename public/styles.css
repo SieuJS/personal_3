@@ -90,3 +90,15 @@
   nav {
     background-color: var(--secondary-bg);
   }
+
+
+
+  .carousel-btn {
+    background-color: var(--secondary-bg);
+  }
+
+  .carousel-img {
+    width: 200px;
+    height: 350px;
+    object-fit: cover;
+  }

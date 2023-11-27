@@ -7,7 +7,22 @@ const MovieHomeTemplate =  require('../views/pages/home/home.template')
 module.exports = {
     
     async Home (req, res, next) {
-        res.send(MovieHomeTemplate())
+        let top15Box , top5Rating, top15Fav;
+        
+        try{
+            top15Box= await fetch("http://localhost:3000/api/top15-box");
+            top5Rating = await fetch("http://localhost:3000/api/top5")
+            top15Fav = []
+            if (!top15Box.ok || !top5Rating.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            top15Box = await top15Box.json();
+            top5Rating = await top5Rating.json();
+        }
+        catch (err){
+            return next(new HttpError(err.message, 500));
+        }
+        res.send(MovieHomeTemplate({top5Rating,top15Box,top15Fav}))
     },
 
     async MovieHerro (req, res, next) {

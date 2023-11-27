@@ -7,7 +7,6 @@ const movieRoute = require('./routes/movie')
 const templateEngine = require('./templateEngine');
 const Movie = require('./models/movie.model');
 
-Movie.run();
 
 
 const app = express();

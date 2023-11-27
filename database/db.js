@@ -1,3 +1,4 @@
+const { as } = require('pg-promise');
 const HttpError = require('../models/http-error')
 require ('dotenv').config();
 
@@ -30,14 +31,17 @@ const createDB = async () => {
         dbcn = await db.connect();        
         // Attempt to create the database
         await dbcn.any("CREATE DATABASE $1:name;", [databaseName]);
-        cn.database = databaseName;
         
-        db = pgp(cn);
+        
+        db = pgp({
+            ...cn ,
+            database : databaseName
+        });
         console.log("create db succes")
-        await createShema();
+        await createShema(db);
     } catch (error) {
         let err = error.message
-        await errHandler(err);
+        
         // Throw an error or handle this case appropriately
     } finally {
         if (dbcn) {
@@ -52,6 +56,11 @@ const createDB = async () => {
 const errHandler = async (err) => {
     if(err.includes('exists')){
         let dbcn = null;
+        let mcn = {
+            ...cn,
+            database : process.env.DB_DB
+        }
+        db = pgp(mcn)
         try {
             dbcn = await db.connect();
             await dbcn.any("DROP DATABASE $1:name;", [databaseName]);
@@ -78,7 +87,7 @@ let schema = {
     Favorites : "Favorites"
 }
 
-const createShema = async () => {
+const createShema = async (db) => {
     let dbcn = null;
     
     try {
@@ -90,7 +99,8 @@ const createShema = async () => {
             "runtimeStr" char(12),
             image char(200),
             awards char(200),
-            rating float
+            rating float,
+            boxOffice BigInt
             );`);
         
         await dbcn.oneOrNone(`
@@ -135,9 +145,9 @@ const createShema = async () => {
         await dbcn.oneOrNone(`
             Create table ${schema.Favorites}(
                 movieId varchar(11),
-                Primary key movieId;
-            )
-        `)
+                Primary key (movieId)
+            );
+        `);
         
     }catch (err){
         throw new Error("table" +err.message);
@@ -149,31 +159,20 @@ const createShema = async () => {
 }
 
 
-
 module.exports = {
-    initial : async() =>{
-        
-        cn.database = databaseName;
-        db = pgp(cn);
-        let dbcn = null ;
-        try {
-            
-            dbcn = await db.connect();
-        }
-        catch (err) {
-            console.log("some err, create")
-            await createDB();
-        }finally {
-            dbcn.done();
-        }
+    initial : async () =>{
+        await createDB();
     },
     client : pgp({
         ...cn,
         database : databaseName
     }),
     isInsert : async (tbName) => {
-        cn.database = databaseName;
-        db = pgp(cn);
+        
+        db = pgp({
+            ...cn,
+            database : databaseName
+        });
         let dbcn = null;
         try {
             dbcn = await db.connect();
@@ -184,9 +183,11 @@ module.exports = {
             else return true;
         }
         catch (error) {
+            return false;
             throw new HttpError(error.message, 500);
         }
         finally {
+            if(dbcn !== null)
             dbcn.done();
         }
     },
